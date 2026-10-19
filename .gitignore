@@ -1,0 +1,39 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local Django data and generated files
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# Environment variables and local secrets
+.env
+.env.*
+.secret_key
+*.pem
+*.p12
+*.pfx
+*.key
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} | ShopSphere</title>
+    <link rel="stylesheet" href="{% static 'store/css/auth.css' %}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f7f7fb; color: #222; }
+        header { background: #fff; padding: 22px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px #0000000d; }
+        .logo { font-size: 25px; font-weight: bold; color: #6c4cf1; text-decoration: none; }
+        nav a { text-decoration: none; color: #444; margin-left: 22px; font-size: 14px; }
+        main { padding: 32px 8% 20px; }
+        .back-link { display: inline-block; margin-bottom: 22px; color: #6c4cf1; text-decoration: none; font-weight: bold; }
+        .product-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: center; padding: 26px; background: #fff; border-radius: 16px; box-shadow: 0 4px 15px #00000008; }
+        .detail-image { min-height: 300px; display: flex; align-items: center; justify-content: center; background: #f0edff; border-radius: 12px; }
+        .detail-image img { width: 100%; height: 360px; object-fit: contain; border-radius: 12px; }
+        .detail-copy h1 { margin: 8px 0 14px; font-size: clamp(28px, 4vw, 42px); }
+        .eyebrow { color: #6c4cf1; font-weight: bold; }
+        .price { margin-bottom: 18px; color: #6c4cf1; font-size: 24px; font-weight: bold; }
+        .description { margin-bottom: 20px; color: #555; line-height: 1.7; }
+        .availability { margin-bottom: 18px; font-weight: bold; }
+        .available { color: #247a43; }
+        .unavailable { color: #a12b2b; }
+        .add-to-cart { width: 100%; padding: 13px; border: none; border-radius: 8px; background: #222; color: #fff; cursor: pointer; font: inherit; }
+        .add-to-cart:hover { background: #6c4cf1; }
+        .add-to-cart:disabled { background: #888; cursor: not-allowed; }
+        .cart { padding: 32px 8% 55px; }
+        .cart h2 { margin-bottom: 20px; }
+        .cart-items { display: grid; gap: 12px; }
+        .cart-empty { padding: 22px; border-radius: 12px; background: #f0edff; color: #555; }
+        .cart-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 20px; padding: 18px; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px #00000008; }
+        .cart-item h3 { margin-bottom: 6px; }
+        .cart-item-details p { color: #666; font-size: 14px; }
+        .quantity-controls { display: flex; align-items: center; gap: 10px; }
+        .quantity-button, .remove-button { border: 0; border-radius: 7px; cursor: pointer; font: inherit; }
+        .quantity-button { width: 34px; height: 34px; background: #f0edff; color: #4b35b8; font-size: 20px; }
+        .remove-button { padding: 9px 12px; background: #fff0f0; color: #a12b2b; }
+        .cart-summary { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; font-size: 20px; font-weight: bold; }
+        .cart-subtotal { color: #6c4cf1; }
+        footer { padding: 25px; text-align: center; background: #fff; color: #666; }
+        @media (max-width: 700px) {
+            header { padding: 18px 5%; flex-wrap: wrap; gap: 15px; }
+            nav a { margin-left: 0; margin-right: 12px; }
+            main { padding: 22px 5% 10px; }
+            .product-detail { grid-template-columns: 1fr; gap: 22px; padding: 18px; }
+            .detail-image { min-height: 220px; }
+            .detail-image img { height: 260px; }
+            .cart { padding: 24px 5% 40px; }
+            .cart-item { grid-template-columns: 1fr auto; gap: 14px; }
+            .cart-item-details { grid-column: 1 / -1; }
+            .cart-line-total { justify-self: end; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="logo" href="{% url 'home' %}">ShopSphere.</a>
+        <nav aria-label="Main navigation">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'home' %}#products">Products</a>
+            <a href="{% url 'home' %}#cart">Cart (<span id="cart-count" aria-live="polite">{{ cart_count }}</span>)</a>
+            {% include "store/partials/account_nav.html" %}
+        </nav>
+    </header>
+
+    <main>
+        <a class="back-link" href="{% url 'home' %}#products">← Back to products</a>
+        <article class="product-detail product-card">
+            <div class="detail-image">
+                <img src="{% static product.image_path %}" alt="{{ product.name }}">
+            </div>
+            <div class="detail-copy">
+                <p class="eyebrow">Product details</p>
+                <h1>{{ product.name }}</h1>
+                <p class="price">₹{{ product.price }}</p>
+                <p class="description">{{ product.description|default:"Product details coming soon."|linebreaksbr }}</p>
+                {% if product.is_available %}
+                    <p class="availability available">Available</p>
+                    <form data-cart-form method="post" action="{% url 'cart_add' product.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}#cart"><button class="add-to-cart" type="submit">Add to Cart</button></form>
+                {% else %}
+                    <p class="availability unavailable">Currently unavailable</p>
+                    <button class="add-to-cart" type="button" disabled>Unavailable</button>
+                {% endif %}
+            </div>
+        </article>
+    </main>
+
+    {% include "store/partials/cart_panel.html" %}
+    <script src="{% static 'store/js/cart.js' %}" defer></script>
+    <footer><p>© 2026 ShopSphere. Made with care.</p></footer>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<section class="cart" id="cart" aria-labelledby="cart-heading">
+    <h2 id="cart-heading">Your Cart</h2>
+    {% if cart_items %}
+        <div class="cart-items" aria-live="polite">
+            {% for item in cart_items %}
+                <article class="cart-item">
+                    <div class="cart-item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p>₹{{ item.product.price|floatformat:2 }} each</p>
+                    </div>
+                    <div class="quantity-controls" aria-label="Quantity controls for {{ item.product.name }}">
+                        <form data-cart-form method="post" action="{% url 'cart_update' item.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}#cart">
+                            <button class="quantity-button" type="submit" name="action" value="decrease" aria-label="Decrease quantity of {{ item.product.name }}">−</button>
+                        </form>
+                        <span aria-label="Quantity: {{ item.quantity }}">{{ item.quantity }}</span>
+                        <form data-cart-form method="post" action="{% url 'cart_update' item.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}#cart">
+                            <button class="quantity-button" type="submit" name="action" value="increase" aria-label="Increase quantity of {{ item.product.name }}">+</button>
+                        </form>
+                    </div>
+                    <strong class="cart-line-total">₹{{ item.subtotal|floatformat:2 }}</strong>
+                    <form data-cart-form method="post" action="{% url 'cart_remove' item.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}#cart">
+                        <button class="remove-button" type="submit">Remove</button>
+                    </form>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="cart-empty">Your cart is empty. Add a product to get started.</p>
+    {% endif %}
+    {% if cart_items %}<div class="checkout-link-wrap"><a class="checkout-link" href="{% url 'checkout' %}">Proceed to demo checkout</a></div>{% endif %}
+    <div class="cart-summary">
+        <span>Subtotal</span>
+        <span class="cart-subtotal">₹{{ cart_subtotal|floatformat:2 }}</span>
+    </div>
+</section>
